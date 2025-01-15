@@ -1,9 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using ExerciceASP.NETCore.Models;
+using ExerciceASP.NETCore.Models.Repositories;
+using Microsoft.Extensions.Logging;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Configure database
+builder.Services.AddDbContext<TodoContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure repo
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+
 var app = builder.Build();
+
+// Init data seeder
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    {
+        SeedData.Initialize(services);
+    }
+
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -22,6 +44,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Todo}/{action=Index}/{id?}");
 
 app.Run();
