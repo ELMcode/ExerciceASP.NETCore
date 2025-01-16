@@ -1,4 +1,4 @@
- using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExerciceASP.NETCore.Models
 {
@@ -10,6 +10,7 @@ namespace ExerciceASP.NETCore.Models
         }
 
         public DbSet<Todo> Todos { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +21,14 @@ namespace ExerciceASP.NETCore.Models
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Title).IsRequired();
                 entity.Property(e => e.Description).IsRequired();
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Username).IsRequired();
+                entity.Property(e => e.Password).IsRequired();
+                entity.HasIndex(e => e.Username).IsUnique();
             });
         }
     }

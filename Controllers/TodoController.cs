@@ -14,9 +14,22 @@ namespace ExerciceASP.NETCore.Controllers
             _todoRepository = todoRepository;
         }
 
+        private IActionResult CheckAuth()
+        {
+            var username = HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(username))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+            return null;
+        }
+
         // GET: Todo
         public IActionResult Index()
         {
+            var authCheck = CheckAuth();
+            if (authCheck != null) return authCheck;
+
             var todos = _todoRepository.GetAll();
             return View(todos);
         }
@@ -24,6 +37,9 @@ namespace ExerciceASP.NETCore.Controllers
         // GET: Todo/Form
         public IActionResult Form()
         {
+            var authCheck = CheckAuth();
+            if (authCheck != null) return authCheck;
+
             return View(new TodoViewModel());
         }
 
@@ -32,6 +48,9 @@ namespace ExerciceASP.NETCore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Add([Bind("Title,Description")] TodoViewModel model)
         {
+            var authCheck = CheckAuth();
+            if (authCheck != null) return authCheck;
+
             if (ModelState.IsValid)
             {
                 var todo = new Todo
@@ -51,6 +70,9 @@ namespace ExerciceASP.NETCore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ToggleComplete(int id)
         {
+            var authCheck = CheckAuth();
+            if (authCheck != null) return authCheck;
+
             var todo = _todoRepository.GetById(id);
             if (todo != null)
             {
@@ -65,6 +87,9 @@ namespace ExerciceASP.NETCore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
+            var authCheck = CheckAuth();
+            if (authCheck != null) return authCheck;
+
             _todoRepository.Delete(id);
             return RedirectToAction(nameof(Index));
         }
